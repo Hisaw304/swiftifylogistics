@@ -462,10 +462,10 @@ const TrackingPage = () => {
             <div className="card-heading">Dates</div>
             <div className="text-sm text-dark mt-2">
               <div>
-                <span className="font-medium">Shipped:</span> July 15, 2025
+                <span className="font-medium">Shipped:</span> October 20, 2025
               </div>
               <div className="mt-1">
-                <span className="font-medium">Expected:</span> July 29, 2025
+                <span className="font-medium">Expected:</span> October 22, 2025
               </div>
             </div>
           </div>
