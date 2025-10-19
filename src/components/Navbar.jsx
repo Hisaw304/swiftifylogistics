@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { Menu, X, Search, User } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
+  const toggleRef = useRef(null); // NEW: ref for the hamburger button
 
   // lock body scroll when menu open
   useEffect(() => {
@@ -22,13 +23,24 @@ export default function Navbar() {
 
   // close when clicking outside mobile menu
   useEffect(() => {
-    const onClick = (e) => {
+    const onPointerDown = (e) => {
       if (!open) return;
-      if (menuRef.current && !menuRef.current.contains(e.target))
-        setOpen(false);
+
+      const target = e.target;
+
+      // If click is inside the menu, do nothing
+      if (menuRef.current && menuRef.current.contains(target)) return;
+
+      // If click is on the toggle button (or its children), ignore it
+      // (prevents pointerdown closing first and then click toggling it back open)
+      if (toggleRef.current && toggleRef.current.contains(target)) return;
+
+      // Otherwise close
+      setOpen(false);
     };
-    window.addEventListener("pointerdown", onClick);
-    return () => window.removeEventListener("pointerdown", onClick);
+
+    window.addEventListener("pointerdown", onPointerDown);
+    return () => window.removeEventListener("pointerdown", onPointerDown);
   }, [open]);
 
   const Nav = ({ to, children }) => (
@@ -76,6 +88,7 @@ export default function Navbar() {
           </Link>
 
           <button
+            ref={toggleRef} // NEW: attach ref
             onClick={() => setOpen((s) => !s)}
             aria-controls="mobile-menu"
             aria-expanded={open}
@@ -103,21 +116,12 @@ export default function Navbar() {
           </nav>
 
           <div className="mobile-cta">
-            {/* Visible mobile CTA — appears because CSS now allows it */}
             <Link
               to="/track"
               className="btn-primary btn-block"
               onClick={() => setOpen(false)}
             >
               Track Package
-            </Link>
-
-            <Link
-              to="/admin"
-              className="btn-ghost btn-block"
-              onClick={() => setOpen(false)}
-            >
-              <User size={16} /> Admin
             </Link>
           </div>
         </div>
