@@ -46,7 +46,7 @@ const App = () => {
         }}
       />
       <Preloader
-        visible={showPreloader}
+        loading={showPreloader}
         onHidden={() => setShowPreloader(false)}
       />
 
