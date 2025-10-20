@@ -936,8 +936,9 @@ button:focus {
   margin: 0.85rem auto 1.6rem;
   max-width: 720px;
 }
+/* ========== HERO - responsive tweaks ========== */
 
-/* search group */
+/* base search group (desktop default) */
 .hero-search {
   display: flex;
   gap: 0.75rem;
@@ -946,67 +947,74 @@ button:focus {
   width: 100%;
   max-width: 720px;
   margin: 0 auto;
-  flex-direction: column;
+  flex-direction: column; /* mobile-first: stacked */
 }
+
+/* row behavior on larger screens */
 @media (min-width: 640px) {
   .hero-search {
     flex-direction: row;
   }
 }
 
+/* input wrapper */
 .hero-input-wrapper {
   position: relative;
-  flex: 1;
-  min-width: 0;
-}
-/* Light green-dark overlay for hero background */
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(11, 79, 42, 0.15),
-    rgba(11, 79, 42, 0.25)
-  );
-  z-index: 1;
+  flex: 1 1 auto;
+  min-width: 0; /* prevents overflow in flex */
+  width: 100%;
 }
 
-/* search icon */
+/* input icon */
 .hero-input-icon {
   position: absolute;
   left: 0.9rem;
   top: 50%;
   transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.85);
+  color: #9aa4af; /* gray that contrasts against white */
+  pointer-events: none;
+  width: 18px;
+  height: 18px;
+  z-index: 2; /* make sure icon sits above input background */
+  transition: color 0.2s ease;
 }
 
-/* input - keep it white and readable on top of image */
+.hero-input:focus ~ .hero-input-icon {
+  color: var(--light-green); /* nice visual cue on focus */
+}
+
+/* input appearance (desktop + mobile) */
 .hero-input {
   width: 100%;
-  padding: 0.85rem 1rem 0.85rem 3rem;
+  padding: 0.75rem 1rem 0.75rem 3rem;
   border-radius: 9999px;
-  background: #ffffff; /* explicit white input per your "no bg color" instruction */
+  background: #ffffff;
   border: 1px solid rgba(13, 79, 42, 0.08);
-  color: var(--text);
-  font-weight: 600;
+  color: var(--text, #0b1220);
+  font-weight: 700;
   font-size: 1rem;
   outline: none;
   box-shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
   transition: box-shadow 0.18s ease, transform 0.12s ease,
     border-color 0.12s ease;
-}
-.hero-input::placeholder {
-  color: #9aa4af;
-  font-weight: 500;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
 }
 
+/* placeholder style */
+.hero-input::placeholder {
+  color: #9aa4af;
+  font-weight: 600;
+}
+
+/* input focus */
 .hero-input:focus {
   border-color: var(--light-green);
   box-shadow: 0 10px 30px rgba(11, 79, 42, 0.12);
   transform: translateY(-1px);
 }
 
-/* button with arrow (arrow facing up by default from lucide ArrowUp) */
+/* primary button (desktop) */
 .hero-btn {
   display: inline-flex;
   align-items: center;
@@ -1020,33 +1028,102 @@ button:focus {
   cursor: pointer;
   box-shadow: 0 10px 28px rgba(11, 79, 42, 0.12);
   transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.12s ease;
+  white-space: nowrap;
+  min-height: 44px; /* accessible touch target */
+  box-sizing: border-box;
 }
+
+/* button hover/active (desktop) */
 .hero-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 16px 38px rgba(11, 79, 42, 0.14);
   filter: saturate(1.03);
 }
 
+/* loading state */
 .hero-btn.loading {
   background: #9aa4af;
   cursor: not-allowed;
-  opacity: 0.85;
+  opacity: 0.95;
   transform: none;
   box-shadow: none;
 }
 
-/* button arrow sizing + color */
+/* arrow inside button */
 .hero-btn .btn-arrow {
   color: var(--forest-700, #083f21);
   transform: translateY(-1px);
 }
 
-/* small example line */
+/* small example under search */
 .hero-example {
   margin-top: 0.9rem;
   color: rgba(255, 255, 255, 0.88);
   font-size: 0.95rem;
+  text-wrap: balance;
 }
+.example-id {
+  color: var(--light-green);
+  font-weight: 700;
+}
+
+/* ========== MOBILE ADJUSTMENTS ========== */
+@media (max-width: 639px) {
+  .hero-search {
+    gap: 0.5rem;
+    padding: 0 0.25rem;
+  }
+
+  .hero-input {
+    padding: 0.72rem 0.95rem 0.72rem 2.9rem; /* slightly tighter on mobile */
+    font-size: 0.96rem;
+    font-weight: 700;
+    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+  }
+
+  .hero-btn {
+    width: 100%; /* full width button on mobile */
+    padding: 0.78rem 0.9rem; /* slightly smaller padding */
+    font-size: 0.98rem;
+    box-shadow: 0 8px 22px rgba(11, 79, 42, 0.1);
+    justify-content: center;
+  }
+
+  /* put button visually after input with consistent spacing */
+  .hero-search > .hero-input-wrapper {
+    order: 0;
+  }
+  .hero-search > .hero-btn {
+    order: 1;
+  }
+
+  .hero-example {
+    margin-top: 0.6rem;
+    font-size: 0.92rem;
+    text-align: center;
+    line-height: 1.25;
+  }
+
+  .hero-input-icon {
+    left: 0.75rem;
+  }
+}
+
+/* ========== TINY: very small phones ========== */
+@media (max-width: 380px) {
+  .hero-input {
+    font-size: 0.92rem;
+    padding-left: 2.6rem;
+  }
+  .hero-btn {
+    padding: 0.68rem 0.8rem;
+    font-size: 0.95rem;
+  }
+  .hero-example {
+    font-size: 0.9rem;
+  }
+}
+
 .example-id {
   color: var(--light-green);
   font-weight: 700;

@@ -268,7 +268,7 @@ export default function ContactForm() {
             {mapActive ? (
               <MapContainer
                 center={MAP_CENTER}
-                zoom={4}
+                zoom={5}
                 scrollWheelZoom={false}
                 style={{ height: "100%", width: "100%" }}
               >
