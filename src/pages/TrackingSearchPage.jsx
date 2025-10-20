@@ -130,23 +130,15 @@ export default function TrackSearchPage() {
             </p>
           </div>
 
-          <div style={{ maxWidth: 760, margin: "0 auto" }}>
+          <div className="track-container">
             <form
               onSubmit={handleTrack}
               className="track-card"
               aria-label="Track shipment form"
             >
-              <div className="search-row" style={{ display: "flex", gap: 12 }}>
-                <label style={{ position: "relative", flex: 1 }}>
-                  <Search
-                    style={{
-                      position: "absolute",
-                      left: 16,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      color: "#9aa4af",
-                    }}
-                  />
+              <div className="search-row">
+                <label className="input-wrapper">
+                  <Search className="input-icon" />
                   <input
                     ref={inputRef}
                     className="input-track"
@@ -161,52 +153,28 @@ export default function TrackSearchPage() {
                 <button
                   type="submit"
                   onClick={handleTrack}
-                  className="btn btn-cta"
+                  className="btn btn-cta track-btn"
                   aria-label="Track shipment"
-                  style={{ minWidth: 140 }}
                 >
-                  <span>Track</span>
-                  <ArrowUp style={{ transform: "rotate(0deg)" }} />
+                  <span className="track-btn-label">Track</span>
+                  <ArrowUp className="track-btn-icon" />
                 </button>
               </div>
 
-              <div
-                style={{
-                  marginTop: 12,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  color: "rgba(255,255,255,0.95)",
-                }}
-              >
-                <div className="text-black">
+              <div className="form-footer">
+                <div className="example">
                   Example:{" "}
-                  <strong style={{ color: "var(--light-green)" }}>
-                    A73BX9LP215F
-                  </strong>
+                  <strong className="example-code">A73BX9LP215F</strong>
                 </div>
-                <div>
-                  Need help?{" "}
-                  <a
-                    href="/contact"
-                    style={{
-                      color: "rgba(255,255,255,0.95)",
-                      textDecoration: "underline",
-                    }}
-                  >
-                    Contact support
-                  </a>
+                <div className="help-link">
+                  Need help? <a href="/contact">Contact support</a>
                 </div>
               </div>
 
               {recent.length > 0 && (
-                <div style={{ marginTop: 14 }}>
-                  <div
-                    style={{ color: "rgba(255,255,255,0.92)", marginBottom: 8 }}
-                  >
-                    Recent searches
-                  </div>
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <div className="recent-section">
+                  <div className="recent-title">Recent searches</div>
+                  <div className="recent-list">
                     {recent.map((r) => (
                       <button
                         key={r}
@@ -215,16 +183,7 @@ export default function TrackSearchPage() {
                         className="recent-chip"
                         aria-label={`Track ${r}`}
                       >
-                        <span
-                          style={{
-                            maxWidth: 160,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {r}
-                        </span>
+                        <span className="recent-chip-text">{r}</span>
                       </button>
                     ))}
                     <button
