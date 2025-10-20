@@ -544,6 +544,16 @@ button:focus {
   background: rgba(0, 0, 0, 0.09);
   transform: translateY(-2px);
 }
+@media (max-width: 640px) {
+  .search-row {
+    flex-direction: column;
+    gap: 8px !important;
+  }
+
+  .search-row button {
+    width: 100% !important;
+  }
+}
 
 /* ---------- HowItWorks styles (Swiftify) ---------- */
 

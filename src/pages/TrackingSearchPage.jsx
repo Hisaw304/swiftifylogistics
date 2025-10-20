@@ -74,7 +74,10 @@ export default function TrackSearchPage() {
       >
         <div className="overlay" aria-hidden />
 
-        <div className="container" style={{ position: "relative", zIndex: 10 }}>
+        <div
+          className="container text-center"
+          style={{ position: "relative", zIndex: 10 }}
+        >
           <div className="align-center" style={{ marginBottom: 18 }}>
             <div className="small-label">
               <svg
@@ -93,6 +96,22 @@ export default function TrackSearchPage() {
                 <circle cx="56.5" cy="2.5" r="2.5" fill="var(--light-green)" />
               </svg>
               <span style={{ color: "white" }}>TRACKING</span>
+              <svg
+                width="59"
+                height="5"
+                viewBox="0 0 59 5"
+                fill="none"
+                aria-hidden
+                style={{ transform: "scaleX(-1)" }}
+              >
+                <rect
+                  width="50"
+                  height="5"
+                  rx="2.5"
+                  fill="var(--light-green)"
+                />
+                <circle cx="56.5" cy="2.5" r="2.5" fill="var(--light-green)" />
+              </svg>
             </div>
           </div>
 
@@ -160,7 +179,7 @@ export default function TrackSearchPage() {
                   color: "rgba(255,255,255,0.95)",
                 }}
               >
-                <div>
+                <div className="text-black">
                   Example:{" "}
                   <strong style={{ color: "var(--light-green)" }}>
                     A73BX9LP215F
@@ -230,9 +249,9 @@ export default function TrackSearchPage() {
 
       {/* Page content */}
       <main style={{ padding: "2.5rem 0" }} className="container">
-        <section style={{ maxWidth: 980, margin: "0 auto", marginBottom: 20 }}>
+        <section className="max-w-[980px] mx-auto mb-5 px-4 sm:px-6">
           <h2 className="h2">Quick tracking help</h2>
-          <p className="text-muted" style={{ marginTop: 8 }}>
+          <p className="text-muted mt-2">
             If you don't have a tracking ID yet, check your order confirmation
             email or contact the sender. Tracking details show on the tracking
             page after search.

@@ -42,18 +42,30 @@ const MAP_CENTER = [39.5, -98.35]; // continental US center
 
 // create an L.divIcon with an inline truck SVG — lightweight, avoids external images
 function createTruckIcon() {
-  const svg = encodeURIComponent(`
+  const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="36" height="24" viewBox="0 0 36 24" fill="none">
-      <rect x="1" y="6" width="20" height="10" rx="2" fill="%23ffffff" stroke="%230b4f2a" stroke-width="1.5"/>
-      <rect x="21" y="9" width="10" height="7" rx="1" fill="%23ffffff" stroke="%230b4f2a" stroke-width="1.5"/>
-      <path d="M21 12h4" stroke="%230b4f2a" stroke-width="1.2" stroke-linecap="round"/>
-      <circle cx="8" cy="18" r="2.5" fill="%230b4f2a"/>
-      <circle cx="26" cy="18" r="2.5" fill="%230b4f2a"/>
+      <rect x="1" y="6" width="20" height="10" rx="2" fill="#ffffff" stroke="#6b21a8" stroke-width="1.5"/>
+      <rect x="21" y="9" width="10" height="7" rx="1" fill="#ffffff" stroke="#6b21a8" stroke-width="1.5"/>
+      <path d="M21 12h4" stroke="#6b21a8" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="8" cy="18" r="2.5" fill="#6b21a8"/>
+      <circle cx="26" cy="18" r="2.5" fill="#6b21a8"/>
     </svg>
-  `);
+  `.trim();
+
   return L.divIcon({
     className: "truck-div-icon",
-    html: `<div class="truck-marker-wrapper"><img src="data:image/svg+xml;utf8,${svg}" alt="hub" /></div>`,
+    html: `
+      <div class="truck-marker-wrapper" style="
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        width:36px;
+        height:24px;
+        overflow:visible;
+      ">
+        ${svg}
+      </div>
+    `,
     iconSize: [36, 24],
     iconAnchor: [18, 12],
   });
