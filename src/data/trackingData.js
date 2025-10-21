@@ -28,7 +28,7 @@ export const trackingData = {
     destLabel: "1108 Blankets Creek Dr Canton Georgia 30114",
     // image stored in public folder -> accessible at /img_6502.png
     image: "/img_6502.png",
-    routeIndex: 2,
+    routeIndex: 4,
   },
 
   // West coast route (Los Angeles -> Seattle)
