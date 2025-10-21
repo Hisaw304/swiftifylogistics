@@ -2,10 +2,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import productImage from "../assets/img_6502.png";
 import MapRoute from "../components/MapRoute";
 import { generateRoute } from "../../api/routeGenerator";
-import { Package } from "lucide-react"; // optional icon; remove if not available
+import { Package } from "lucide-react";
+import { trackingData as TRACKING_DATA } from "../data/trackingData";
 
 // --- small inline ProgressBar component used in the layout ---
 function ProgressBar({ progress = 0, status = "Shipped" }) {
@@ -28,24 +28,6 @@ function ProgressBar({ progress = 0, status = "Shipped" }) {
       <div className="mt-2 text-xs text-gray-500">{progress}% complete</div>
     </div>
   );
-}
-
-// --- small helpers used in UI ---
-function formatTime(dateStr) {
-  if (!dateStr) return "—";
-  try {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString();
-  } catch (e) {
-    return dateStr;
-  }
-}
-
-function formatLocation(loc) {
-  if (!loc) return "—";
-  if (typeof loc === "string") return loc;
-  if (loc.city && loc.state) return `${loc.city}, ${loc.state}`;
-  return "—";
 }
 
 // basic statusInfo object for CTA note
@@ -79,43 +61,26 @@ const TrackingPage = () => {
     }
   }, [location, navigate]);
 
-  // minimal/mock tracking data (fall back)
-  // Mock tracking data (kept for demonstration)
-  const trackingData = {
-    R57LX3PA912F: {
-      status: "Shipped",
-      deliveryDate: "Arriving Monday, July 29",
-      product: "Safe Box",
-      quantity: 1,
-      name: "Gene Barber",
-      address: "1108 Blankets Creek Dr Canton Georgia 30114, USA",
-    },
-    T84QZ7NK305H: {
-      status: "Delivered",
-      deliveryDate: "Delivered Friday, July 19",
-      product: "Running Shoes - Size 10",
-      quantity: 2,
-      name: "Emily Carter",
-      address: "123 Main Street, Austin, TX 73301, USA",
-    },
-    M29DW6VC478J: {
-      status: "On Hold",
-      deliveryDate: "Pending — awaiting clearance",
-      product: "Safe Box (contains confidential items)",
-      quantity: 1,
-      name: "Michael Smith",
-      address: "456 Oak Drive, San Diego, CA 92103, USA",
-    },
-  };
+  // Use centralized tracking data imported from src/data/tracking.js
+  const trackingData = TRACKING_DATA || {};
 
   const data = trackingData[id] || {
     status: "Shipped",
-    deliveryDate: "Pending",
     product: "Demo item",
     quantity: 1,
     name: "Demo Recipient",
     address: "Demo address",
-    shipmentDate: "2025-10-15",
+    shippedDate: "2025-10-15",
+    expectedDate: "2025-10-20",
+    serviceDescription: "Service · Demo Shipment",
+    contents: "Demo contents",
+    declaredValue: "$0.00",
+    note: "Demo note",
+    senderName: "Demo Sender",
+    senderAddress: "Demo Sender Address",
+    image: "/img_6502.png",
+    originLabel: "New York, NY",
+    destLabel: "Atlanta, GA",
   };
 
   const status = data.status || "Shipped";
@@ -124,25 +89,34 @@ const TrackingPage = () => {
   const defaultRoute = useMemo(
     () =>
       generateRoute(
-        "United States Postal Service, 421 8th Ave, New York, NY 10001",
-        "1108 Blankets Creek Dr Canton Georgia 30114"
+        data.originLabel ||
+          "United States Postal Service, 421 8th Ave, New York, NY 10001",
+        data.destLabel || "1108 Blankets Creek Dr Canton Georgia 30114"
       ),
-    []
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [id] // regenerate if id changes (so route selects per-tracking item)
   );
 
   const route = defaultRoute || [];
-  const [routeIndex, setRouteIndex] = useState(2);
+
+  // initialize from data (fallback to 2)
+  const [routeIndex, setRouteIndex] = useState(() => data?.routeIndex ?? 2);
   const [prevRouteIndex, setPrevRouteIndex] = useState(null);
 
-  // prevRouteIndex for animated marker interpolation
+  // when routeIndex changes → store previous step for animation
   useEffect(() => {
-    setPrevRouteIndex(routeIndex - 1 >= 0 ? routeIndex - 1 : null);
+    setPrevRouteIndex(routeIndex > 0 ? routeIndex - 1 : null);
   }, [routeIndex]);
+
+  // when tracking ID changes → reset to that record’s defined index
+  useEffect(() => {
+    setRouteIndex(data?.routeIndex ?? 2);
+  }, [id, data?.routeIndex]);
 
   // compute progress; Delivered forces 100%
   const progress = useMemo(() => {
     if (!route.length) return 0;
-    if (status === "Delivered") return 100;
+    if (status?.toLowerCase() === "delivered") return 100;
     const len = Math.max(1, route.length - 1);
     const clamped = Math.max(0, Math.min(routeIndex, route.length - 1));
     return Math.round((clamped / len) * 100);
@@ -172,7 +146,7 @@ const TrackingPage = () => {
 
   // small image fallback state (optional)
   const [imgError, setImgError] = useState(false);
-  const imgSrc = imgError ? "/placeholder.png" : productImage;
+  const imgSrc = imgError ? "/placeholder.png" : data.image || "/img_6502.png";
 
   // helper values used in layout
   const currentIndex = routeIndex;
@@ -270,7 +244,7 @@ const TrackingPage = () => {
           <div className="min-w-0 flex-1">
             <div className="inline-block card-heading-inline">Tracking ID</div>
             <div className="mt-2 text-lg md:text-2xl font-bold break-words card-id">
-              {id}
+              {data.id || id}
             </div>
             <div className="mt-1 text-sm text-muted card-product">
               {data?.product || ""}
@@ -283,14 +257,26 @@ const TrackingPage = () => {
               <div>
                 <div className="card-heading">Shipped</div>
                 <div className="mt-1 text-sm md:text-base font-medium">
-                  October 20, 2025
+                  {data.shippedDate
+                    ? new Date(data.shippedDate).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })
+                    : "—"}
                 </div>
               </div>
 
               <div>
                 <div className="card-heading">Expected</div>
                 <div className="mt-1 text-sm md:text-base font-medium">
-                  October 22, 2025
+                  {data.expectedDate
+                    ? new Date(data.expectedDate).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })
+                    : "—"}
                 </div>
               </div>
             </div>
@@ -379,7 +365,7 @@ const TrackingPage = () => {
                     {data?.product || "Secure Safe Box"}
                   </div>
                   <div className="text-xs text-muted">
-                    Service · Shipment from New York → Atlanta
+                    {data.serviceDescription || "Service · Shipment"}
                   </div>
                 </div>
               </div>
@@ -389,15 +375,15 @@ const TrackingPage = () => {
 
             <div className="mt-3 text-sm text-dark space-y-1 border-top pt-2">
               <div>
-                <span className="font-medium">Contents:</span> Fireproof safe
-                box
+                <span className="font-medium">Contents:</span>{" "}
+                {data.contents || "—"}
               </div>
               <div>
-                <span className="font-medium">Declared Value:</span> $3,000,000
+                <span className="font-medium">Declared Value:</span>{" "}
+                {data.declaredValue || "—"}
               </div>
               <div>
-                <span className="font-medium">Note:</span> Password sealed in
-                tamper-proof envelope and delivered only to verified recipient.
+                <span className="font-medium">Note:</span> {data.note || "—"}
               </div>
             </div>
 
@@ -448,24 +434,37 @@ const TrackingPage = () => {
             <div className="card-heading">Sender Information</div>
             <div className="text-sm text-dark space-y-1 mt-2">
               <div>
-                <span className="font-medium">Sender:</span> Natasha Lorena
+                <span className="font-medium">Sender:</span>{" "}
+                {data.senderName || "—"}
               </div>
               <div>
-                <span className="font-medium">Sender Address:</span> 421 8th
-                Ave, New York, NY 10001, USA
+                <span className="font-medium">Sender Address:</span>{" "}
+                {data.senderAddress || "—"}
               </div>
             </div>
           </div>
-
-          {/* Dates Card */}
           <div className="card-section mt-4 card-bordered">
             <div className="card-heading">Dates</div>
-            <div className="text-sm text-dark mt-2">
-              <div>
-                <span className="font-medium">Shipped:</span> October 20, 2025
+            <div className="text-sm text-dark space-y-1 mt-2">
+              <div className="mt-2">
+                <span className="font-medium">Shipped:</span>{" "}
+                {data.shippedDate
+                  ? new Date(data.shippedDate).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : "—"}
               </div>
-              <div className="mt-1">
-                <span className="font-medium">Expected:</span> October 22, 2025
+              <div>
+                <span className="font-medium">Expected:</span>{" "}
+                {data.expectedDate
+                  ? new Date(data.expectedDate).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : "—"}
               </div>
             </div>
           </div>
@@ -478,8 +477,14 @@ const TrackingPage = () => {
             <div className="rounded overflow-hidden h-[420px] bg-gray-50 mt-3">
               {routeToRender.length > 0 ? (
                 <MapRoute
-                  originLabel="United States Postal Service, 421 8th Ave, New York, NY 10001"
-                  destLabel="1108 Blankets Creek Dr Canton Georgia 30114"
+                  originLabel={
+                    data.originLabel ||
+                    "United States Postal Service, 421 8th Ave, New York, NY 10001"
+                  }
+                  destLabel={
+                    data.destLabel ||
+                    "1108 Blankets Creek Dr Canton Georgia 30114"
+                  }
                   currentIndex={indexForRender}
                   prevIndex={prevRouteIndex}
                   height={420}
@@ -494,19 +499,48 @@ const TrackingPage = () => {
 
           {/* small note area (keeps previous status note styling) */}
           {statusNote && (
-            <div className="text-center font-medium status-note-plain">
-              {statusNote.text}
+            <div
+              className={`mt-4 trk-status-note p-3 rounded border ${
+                status === "Delivered"
+                  ? "bg-green-50 border-green-200"
+                  : status === "Shipped" || status === "On the Way"
+                  ? "bg-blue-50 border-blue-200"
+                  : status === "On Hold"
+                  ? "bg-red-50 border-red-200"
+                  : "bg-gray-50 border-gray-200"
+              }`}
+            >
+              <div
+                className={`text-sm font-medium ${
+                  status === "Delivered"
+                    ? "text-green-800"
+                    : status === "Shipped" || status === "On the Way"
+                    ? "text-blue-800"
+                    : status === "On Hold"
+                    ? "text-red-800"
+                    : "text-gray-800"
+                }`}
+              >
+                {statusNote.text}
+              </div>
+
               {statusNote.link && (
-                <>
-                  {" "}
+                <div className="mt-2">
                   <a
                     href={statusNote.link}
-                    className="underline status-note-link"
+                    className={`underline ${
+                      status === "Delivered"
+                        ? "text-green-700 hover:text-green-900"
+                        : status === "Shipped" || status === "On the Way"
+                        ? "text-blue-700 hover:text-blue-900"
+                        : status === "On Hold"
+                        ? "text-red-700 hover:text-red-900"
+                        : "text-blue-700 hover:text-blue-900"
+                    }`}
                   >
                     Contact support
                   </a>
-                  .
-                </>
+                </div>
               )}
             </div>
           )}

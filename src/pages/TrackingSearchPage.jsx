@@ -1,33 +1,44 @@
-// src/pages/TrackSearchPage.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Search, ArrowUp } from "lucide-react";
-import HowItWorks from "../components/HowItWorks"; // updated component below
-import topBg from "../assets/service-road.jpg"; // optional — will be covered by CSS overlay
+import HowItWorks from "../components/HowItWorks";
+import topBg from "../assets/service-road.jpg";
+import { trackingData } from "../data/trackingData";
 
 const RECENT_KEY = "shiptrace_recent_tracks_v1";
 
-export default function TrackSearchPage() {
+// single canonical finder (used both here and in TrackingPage)
+const findTrackingKey = (maybeId) => {
+  if (!maybeId) return null;
+  const normalized = String(maybeId).trim().toUpperCase();
+  if (trackingData[normalized]) return normalized;
+  const found = Object.keys(trackingData).find(
+    (k) => String(k).toUpperCase() === normalized
+  );
+  return found || null;
+};
+
+export default function TrackingSearchPage() {
   const [trackingId, setTrackingId] = useState("");
   const [recent, setRecent] = useState([]);
+  const [loading, setLoading] = useState(false);
   const inputRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const raw = localStorage.getItem(RECENT_KEY);
-    if (raw) {
-      try {
-        setRecent(JSON.parse(raw));
-      } catch {
-        setRecent([]);
-      }
+    try {
+      const raw = localStorage.getItem(RECENT_KEY);
+      if (raw) setRecent(JSON.parse(raw));
+    } catch {
+      setRecent([]);
     }
   }, []);
 
+  // store canonical (normalized uppercase) IDs
   const pushRecent = (id) => {
     if (!id) return;
-    const normalized = id.trim();
+    const normalized = String(id).trim().toUpperCase();
     if (!normalized) return;
     const next = [normalized, ...recent.filter((r) => r !== normalized)].slice(
       0,
@@ -39,26 +50,51 @@ export default function TrackSearchPage() {
     } catch {}
   };
 
-  const handleTrack = (e) => {
-    if (e) e.preventDefault();
-    const id = (trackingId || "").trim();
-    if (!id) {
+  const handleTrack = async (e) => {
+    if (e && typeof e.preventDefault === "function") e.preventDefault();
+    const raw = String(trackingId || "").trim();
+    if (!raw) {
       toast.error("Please enter a tracking ID");
       inputRef.current?.focus();
       return;
     }
-    pushRecent(id);
-    navigate(`/track/${encodeURIComponent(id)}`, {
-      state: { fromSearch: true },
-    });
+
+    setLoading(true);
+    try {
+      const key = findTrackingKey(raw);
+      console.debug("TrackSearch: raw=", raw, "foundKey=", key);
+      if (!key) {
+        toast.error("Tracking ID not found");
+        inputRef.current?.focus();
+        return;
+      }
+
+      pushRecent(key);
+      // update input to canonical form so user sees normalized value
+      setTrackingId(key);
+
+      // IMPORTANT: navigate using the canonical key (no extra encoding)
+      navigate(`/track/${key}`, { state: { fromHome: true } });
+    } catch (err) {
+      console.error("Track error:", err);
+      toast.error("Unexpected error — try again");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRecentClick = (id) => {
-    setTrackingId(id);
-    pushRecent(id);
-    navigate(`/track/${encodeURIComponent(id)}`, {
-      state: { fromSearch: true },
-    });
+  const handleRecentClick = (rawId) => {
+    if (!rawId) return;
+    const key = findTrackingKey(rawId);
+    console.debug("Recent click:", rawId, "->", key);
+    if (!key) {
+      toast.error("Tracking ID not found");
+      return;
+    }
+    // set input to canonical key, store and navigate using canonical key
+    setTrackingId(key);
+    pushRecent(key);
+    navigate(`/track/${key}`, { state: { fromHome: true } });
   };
 
   const onKeyDown = (e) => {
@@ -67,7 +103,6 @@ export default function TrackSearchPage() {
 
   return (
     <div>
-      {/* Top hero */}
       <section
         className="track-top"
         style={{ backgroundImage: topBg ? `url(${topBg})` : undefined }}
@@ -147,16 +182,19 @@ export default function TrackSearchPage() {
                     onChange={(e) => setTrackingId(e.target.value)}
                     onKeyDown={onKeyDown}
                     aria-label="Tracking ID"
+                    autoComplete="off"
                   />
                 </label>
 
                 <button
                   type="submit"
-                  onClick={handleTrack}
                   className="btn btn-cta track-btn"
                   aria-label="Track shipment"
+                  disabled={loading}
                 >
-                  <span className="track-btn-label">Track</span>
+                  <span className="track-btn-label">
+                    {loading ? "Checking..." : "Track"}
+                  </span>
                   <ArrowUp className="track-btn-icon" />
                 </button>
               </div>
@@ -206,7 +244,6 @@ export default function TrackSearchPage() {
         </div>
       </section>
 
-      {/* Page content */}
       <main style={{ padding: "2.5rem 0" }} className="container">
         <section className="max-w-[980px] mx-auto mb-5 px-4 sm:px-6">
           <h2 className="h2">Quick tracking help</h2>
@@ -217,7 +254,6 @@ export default function TrackSearchPage() {
           </p>
         </section>
 
-        {/* How it works component (below) */}
         <HowItWorks />
       </main>
     </div>

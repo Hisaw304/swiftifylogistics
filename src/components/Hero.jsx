@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { Search, ArrowUp } from "lucide-react";
 import heroImage from "../assets/hero-bg.jpeg";
-import { trackingData } from "../../data/trackingData";
+import { trackingData } from "../data/trackingData";
 
 const Hero = () => {
   const [trackingId, setTrackingId] = useState("");
