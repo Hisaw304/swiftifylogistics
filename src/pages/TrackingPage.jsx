@@ -43,7 +43,7 @@ const statusInfo = {
     color: "text-green-700",
   },
   "on hold": {
-    text: "⚠️ Your order is currently on hold. Delivery pending tax clearance. Please contact support for more details.",
+    text: "⚠️ Your order is currently on hold. Delivery pending tax clearance. Please contact sender for more details immediately or package will be returned.",
     link: "/contact",
     color: "text-red-700",
   },
@@ -258,10 +258,14 @@ const TrackingPage = () => {
                 <div className="card-heading">Shipped</div>
                 <div className="mt-1 text-sm md:text-base font-medium">
                   {data.shippedDate
-                    ? new Date(data.shippedDate).toLocaleDateString("en-US", {
+                    ? new Date(data.shippedDate).toLocaleString("en-US", {
+                        timeZone: "America/New_York", // 7 PM USA time zone
                         year: "numeric",
                         month: "long",
                         day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
                       })
                     : "—"}
                 </div>
@@ -271,10 +275,14 @@ const TrackingPage = () => {
                 <div className="card-heading">Expected</div>
                 <div className="mt-1 text-sm md:text-base font-medium">
                   {data.expectedDate
-                    ? new Date(data.expectedDate).toLocaleDateString("en-US", {
+                    ? new Date(data.expectedDate).toLocaleString("en-US", {
+                        timeZone: "America/New_York", // same timezone for consistency
                         year: "numeric",
                         month: "long",
                         day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
                       })
                     : "—"}
                 </div>
@@ -449,20 +457,29 @@ const TrackingPage = () => {
               <div className="mt-2">
                 <span className="font-medium">Shipped:</span>{" "}
                 {data.shippedDate
-                  ? new Date(data.shippedDate).toLocaleDateString("en-US", {
+                  ? new Date(data.shippedDate).toLocaleString("en-US", {
+                      timeZone: "America/New_York", // USA time
                       year: "numeric",
                       month: "long",
                       day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
                     })
                   : "—"}
               </div>
+
               <div>
                 <span className="font-medium">Expected:</span>{" "}
                 {data.expectedDate
-                  ? new Date(data.expectedDate).toLocaleDateString("en-US", {
+                  ? new Date(data.expectedDate).toLocaleString("en-US", {
+                      timeZone: "America/New_York", // USA time
                       year: "numeric",
                       month: "long",
                       day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
                     })
                   : "—"}
               </div>

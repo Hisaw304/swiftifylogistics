@@ -7,7 +7,7 @@ export const trackingData = {
   // Original example (NYC -> Canton GA)
   R57LX3PA912F: {
     id: "R57LX3PA912F",
-    status: "Shipped",
+    status: "On Hold",
     product: "Safe Box",
     quantity: 1,
     name: "Gene Barber",
