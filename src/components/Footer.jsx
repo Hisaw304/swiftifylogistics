@@ -54,7 +54,7 @@ export default function Footer() {
               <Link to="/">Home</Link>
             </li>
             <li>
-              <Link to="/about">About</Link>
+              <Link to="/tract">Track</Link>
             </li>
             <li>
               <Link to="/contact">Contact</Link>
@@ -85,7 +85,6 @@ export default function Footer() {
               support@swiftifylogistics.com
             </a>
           </p>
-          <p className="small-muted">Phone: +1 (555) 123-4567</p>
         </div>
       </div>
 

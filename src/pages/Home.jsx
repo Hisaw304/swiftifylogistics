@@ -14,7 +14,6 @@ const Home = () => {
       <HowItWorks />
       <FeaturesSection />
       <WhyShipWithUs />
-
       <TrustedBanner />
       <Testimonials />
       <ContactForm />

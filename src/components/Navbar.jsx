@@ -73,7 +73,7 @@ export default function Navbar() {
         <nav className="nav-links" aria-label="Main navigation">
           <Nav to="/">Home</Nav>
           <Nav to="/track">Track</Nav>
-          <Nav to="/about">About</Nav>
+          {/* <Nav to="/about">About</Nav> */}
           <Nav to="/contact">Contact</Nav>
         </nav>
 
@@ -111,7 +111,7 @@ export default function Navbar() {
           <nav aria-label="Mobile navigation" className="mobile-nav">
             <Nav to="/">Home</Nav>
             <Nav to="/track">Track</Nav>
-            <Nav to="/about">About</Nav>
+            {/* <Nav to="/about">About</Nav> */}
             <Nav to="/contact">Contact</Nav>
           </nav>
 
